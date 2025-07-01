@@ -21,23 +21,23 @@ struct Node_lista{
 Node_lista* crearNodo(int valor) {
     Node_lista* nuevo = new Node_lista;
     nuevo->value = valor;
-    nuevo->next = nullptr;
-    nuevo->down = nullptr;
+    nuevo->next = NULL;
+    nuevo->down = NULL;
     return nuevo;
 }
 
 Node_lista* buscarNodo(Node_lista* cabeza, int valor) {
     Node_lista* actual = cabeza;
-    while (actual != nullptr) {
+    while (actual != NULL) {
         if (actual->value == valor) return actual;
         actual = actual->next;
     }
-    return nullptr; 
+    return NULL; 
 }
 
 void agregarArista(Node_lista** cabeza, int origen, int destino, int peso){
     Node_lista* nodoOrigen = buscarNodo(*cabeza, origen);
-    if (nodoOrigen == nullptr) {
+    if (nodoOrigen == NULL) {
         nodoOrigen = crearNodo(origen);
         nodoOrigen->next = *cabeza;
         *cabeza = nodoOrigen;
@@ -54,13 +54,13 @@ Node_lista* leerArchivo(){
     ifstream archivo("estructura.txt");
     if (!archivo.is_open()) {
         cerr << "Error al abrir el archivo." << endl;
-        return nullptr;
+        return NULL;
     }
 
     int total_nodos;
     archivo >> total_nodos;
 
-    Node_lista* cabeza = nullptr;
+    Node_lista* cabeza = NULL;
     int origen, destino, peso;
 
     while (archivo >> origen >> destino >> peso) {
@@ -75,10 +75,10 @@ Node_lista* leerArchivo(){
 void imprimirGrafo(Node_lista* cabeza){
     Node_lista* actualNodo = cabeza;
     cout << "El grafo implementado con Lista de Adyacencia seria:\n";
-    while (actualNodo != nullptr) {
+    while (actualNodo != NULL) {
         cout << "Nodo " << actualNodo->value << " -> ";
         Arista* actualArista = actualNodo->down;
-        while (actualArista != nullptr) {
+        while (actualArista != NULL) {
             cout << "( Conectado con: " << actualArista->destino << ", Peso: " << actualArista->peso << ") ";
             actualArista = actualArista->next;
         }
@@ -89,9 +89,9 @@ void imprimirGrafo(Node_lista* cabeza){
 
 void liberarGrafo(Node_lista* cabeza){
     Node_lista* actualNodo = cabeza;
-    while (actualNodo != nullptr){
+    while (actualNodo != NULL){
         Arista* actualArista = actualNodo->down;
-        while (actualArista != nullptr) {
+        while (actualArista != NULL) {
             Arista* temp = actualArista;
             actualArista = actualArista->next;
             delete temp;
@@ -104,7 +104,7 @@ void liberarGrafo(Node_lista* cabeza){
 
 int main(){
     Node_lista* grafo = leerArchivo();  
-    if (grafo != nullptr) {
+    if (grafo != NULL) {
         imprimirGrafo(grafo);
         liberarGrafo(grafo);
     }
