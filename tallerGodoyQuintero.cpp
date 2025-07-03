@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "color.h"
 
 using namespace std;
 
@@ -80,7 +81,7 @@ Node_vertice* leerArchivo(){
 
 void imprimirGrafo(Node_vertice* cabeza){
     Node_vertice* actualNodo = cabeza;
-    cout << "El grafo implementado con Lista de Adyacencia seria:\n";
+    colorP (10, "El grafo implementado con Lista de Adyacencia seria:");
     cout << "\t(Vertice conectado, Peso)\n\n";
     while (actualNodo != NULL) {
         cout << "Nodo " << actualNodo->value << " -> ";
@@ -180,8 +181,8 @@ void primAMC(Node_vertice* grafo) {
         }
     }
 
-    cout << "\n\nAlgoritmo de Prim:\n";
-    cout << "\n\tArbol Minimo Cobertor (AMC):\n\n";
+    colorP (13, "\n\nAlgoritmo de Prim:");
+    colorP (6, "\tArbol Minimo Cobertor (AMC):");
     cout << "\tArista (Rama) \tPeso\n";
     
     int pesoTotal = 0;
@@ -301,6 +302,89 @@ void djikstra (Node_vertice* grafo, int verticeOrigen){
 
 }
 
+
+int obtenerIndice(Node_vertice* grafo, int vertice) {
+    int indice = 0;
+    Node_vertice* actual = grafo;
+    while (actual != NULL) {
+        if (actual->value == vertice) { 
+            return indice;
+        }
+        actual = actual->next;
+        indice++;
+    }
+    return -1; // No fue encontrado
+}
+
+
+// Función para comprobar si un color esta disponible para el vertice
+bool colorDisponible(Node_vertice* vertice, int colores[], int color, Node_vertice* grafo) {
+    Arista* arista = vertice->down;
+    while (arista != NULL) {
+        int idxVecino = obtenerIndice(grafo, arista->destino);
+        if (idxVecino != -1 && colores[idxVecino] == color) {
+            return false;
+        }
+        arista = arista->next;
+    }
+    return true;
+}
+
+void colorearGrafo(Node_vertice* grafo, int numVertices) {
+int* colores = new int[numVertices];
+const char* nombresColores[] = {
+    "Rojo", "Verde", "Azul", "Amarillo", "Naranja",
+    "Morado", "Cian", "Rosa", "Gris", "Marrón"
+};
+
+int codigosColores[] = {
+    12, // Rojo
+    10, // Verde
+    9,  // Azul
+    14, // Amarillo
+    6,  // Naranja 
+    13, // Morado
+    11, // Cian
+    13, // Rosa 
+    8,  // Gris
+    4   // Marrón 
+};
+
+    
+    // Inicializar todos los colores como no asignados (-1)
+    for (int i = 0; i < numVertices; i++) {
+        colores[i] = -1;
+    }
+
+    Node_vertice* actual = grafo;
+    while (actual != NULL) {
+        int indice = obtenerIndice(grafo, actual->value);
+
+        // Probar colores desde 0 hasta numVertices - 1
+        for (int c = 0; c < numVertices; c++) {
+            if (colorDisponible(actual, colores, c, grafo)) {
+                colores[indice] = c;
+                break;
+            }
+        }
+
+        actual = actual->next;
+    }
+
+    // Mostrar grafo coloreado
+    cout << "Coloración del grafo:\n";
+    actual = grafo;
+    while (actual != NULL) {
+        int indice = obtenerIndice(grafo, actual->value);
+        int color = colores[indice];
+        cout << "Vértice " << actual->value << " -> ";
+        colorP(codigosColores[color], nombresColores[color]);
+        actual = actual -> next;
+}
+
+    delete[] colores;
+}
+
 int main(){
    int verticeInicio, op;
     Node_vertice* grafo = leerArchivo();  
@@ -309,14 +393,15 @@ int main(){
             cout << "TALLER #2 Grafos. Realizado por Enrique Godoy y Jose Quintero\n";
 
         while (op != 5){
-            cout << "      \nMENU" << endl;
+            colorP(9, "\n      MENU");
             cout << "1.  Imprimir Grafo\n";
             cout << "2.  Ver Arbol Minimo CObertor (Algoritmo de Prim)\n";
-            cout << "3.  Ver el Camino de Minimo Costo partiendo desde un Vertice (Algoritmo de Djikstra)\n";
+            cout << "3.  Ver el Camino de Costo Minimo partiendo desde un Vertice (Algoritmo de Djikstra)\n";
             cout << "4.  Ver el coloreado de cada vertice del Grafo (Algoritmo Boraz de Coloracion)\n";
             cout << "5.  Cerrar Programa\n";
             cout << "\n\t Indique el numero de operacion que desea realizar: ";
             cin >> op;
+            color_siguiente(7, " ");
 
 
                 switch (op){
@@ -329,7 +414,7 @@ int main(){
                 break;
 
             case 3:
-                cout << "\n\nAlgoritmo de Djikstra:\n";
+                colorP (1, "\n\nAlgoritmo de Djikstra:");
                     do{
                     cout << "\n\tIndique el Vertice desde donde se desea conocer el camino de menor costo hacia todos los vertices: \n";
                     cout << "\tVertices disponibles: ( 0 - " << numVertices-1 << " ): ";
@@ -343,6 +428,8 @@ int main(){
                 break;
 
             case 4:
+                colorP(5, "Algoritmo Boraz de coloración");
+                colorearGrafo(grafo, numVertices);
                 break;
 
             case 5:
