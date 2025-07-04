@@ -425,7 +425,7 @@ int main(){
             colorP(7, "│ 1. Imprimir Grafo                            │\n");
             colorP(7, "│ 2. Ver Árbol Mínimo Cobertor (Prim)          │\n");
             colorP(7, "│ 3. Camino de Costo Mínimo (Dijkstra)         │\n");
-            colorP(7, "│ 4. Coloración del Grafo (Algoritmo Boraz)    │\n");
+            colorP(7, "│ 4. Coloración del Grafo (Algoritmo Voraz)    │\n");
             colorP(7, "│ 5. Cerrar Programa                           │\n");
             colorP(6, "└──────────────────────────────────────────────┘\n");
             colorP(14, "\nIndique el número de operación que desea realizar: ");
@@ -461,7 +461,7 @@ int main(){
                 break;
 
             case 4:
-                colorP(5, "\n=== ALGORITMO BORAZ DE COLORACIÓN ===\n");
+                colorP(5, "\n=== ALGORITMO VORAZ DE COLORACIÓN ===\n");
                 colorearGrafo(grafo, total_nodos);
                 break;
 
