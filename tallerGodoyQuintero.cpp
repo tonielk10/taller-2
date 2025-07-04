@@ -5,19 +5,22 @@
 
 using namespace std;
 
-struct Arista{
-    int destino;
-    int peso;
-    Arista* next;
+// Estructura que representa una arista en el grafo
+struct Arista {
+    int destino; // Nodo destino de la arista
+    int peso;    // Peso de la arista
+    Arista* next; // Puntero a la siguiente arista
 };
 
-struct Node_vertice{
-    int value;
-    int peso;
-    Node_vertice* next;
-    Arista* down;
+// Estructura que representa un vértice en el grafo
+struct Node_vertice {
+    int value;       // Valor del vértice
+    int peso;        // Peso del vértice (no utilizado actualmente)
+    Node_vertice* next; // Puntero al siguiente vértice
+    Arista* down;    // Puntero a la lista de aristas del vértice
 };
 
+// Crea un nuevo vértice con el valor especificado
 Node_vertice* crearNodo(int valor) {
     Node_vertice* nuevo = new Node_vertice;
     nuevo->value = valor;
@@ -26,6 +29,7 @@ Node_vertice* crearNodo(int valor) {
     return nuevo;
 }
 
+// Busca un vértice en el grafo por su valor
 Node_vertice* buscarNodo(Node_vertice* cabeza, int valor) {
     Node_vertice* actual = cabeza;
     while (actual != NULL) {
@@ -35,7 +39,8 @@ Node_vertice* buscarNodo(Node_vertice* cabeza, int valor) {
     return NULL; 
 }
 
-void agregarArista(Node_vertice** cabeza, int origen, int destino, int peso){
+// Agrega una arista entre dos vértices en el grafo
+void agregarArista(Node_vertice** cabeza, int origen, int destino, int peso) {
     Node_vertice* nodoOrigen = buscarNodo(*cabeza, origen);
     if (nodoOrigen == NULL) {
         nodoOrigen = crearNodo(origen);
@@ -57,14 +62,24 @@ void agregarArista(Node_vertice** cabeza, int origen, int destino, int peso){
     nodoDestino->down = arista2;
 }
 
-Node_vertice* leerArchivo(){
+// Lee el grafo desde un archivo de texto
+Node_vertice* leerArchivo() {
+    // Intenta diferentes rutas para el archivo
     ifstream archivo("estructura.txt");
     if (!archivo.is_open()) {
-        cout << "Error al abrir el archivo." << endl;
+        archivo.open("./estructura.txt");
+    }
+    if (!archivo.is_open()) {
+        archivo.open("/Users/enr.g/Documents/UCAB/Taller_2/taller-2/estructura.txt");
+    }
+    
+    if (!archivo.is_open()) {
+        colorP(12, "Error al abrir el archivo estructura.txt");
+        colorP(14, "Asegúrate de que el archivo esté en el directorio del programa");
         return NULL;
     }
 
-    int total_nodos;
+    int total_nodos; // Número total de nodos (no utilizado actualmente)
     archivo >> total_nodos;
 
     Node_vertice* cabeza = NULL;
@@ -75,19 +90,28 @@ Node_vertice* leerArchivo(){
     }
 
     archivo.close();
+    colorP(2, "Archivo leído correctamente");
     return cabeza;
 }
 
-
-void imprimirGrafo(Node_vertice* cabeza){
+// Imprime el grafo en formato de lista de adyacencia
+void imprimirGrafo(Node_vertice* cabeza) {
     Node_vertice* actualNodo = cabeza;
-    colorP (10, "El grafo implementado con Lista de Adyacencia seria:");
-    cout << "\t(Vertice conectado, Peso)\n\n";
+    colorP(6, "\n=== GRAFO IMPLEMENTADO CON LISTA DE ADYACENCIA ===");
+    colorP(7, "(Vértice conectado, Peso)\n");
+    
     while (actualNodo != NULL) {
-        cout << "Nodo " << actualNodo->value << " -> ";
+        colorPrint(3, "Nodo ");
+        colorPrint(1, to_string(actualNodo->value));
+        colorPrint(7, " -> ");
+        
         Arista* actualArista = actualNodo->down;
         while (actualArista != NULL) {
-            cout << " ( " << actualArista->destino << " , " << actualArista->peso << " )  ";
+            colorPrint(10, " ( ");
+            colorPrint(4, to_string(actualArista->destino));
+            colorPrint(10, " , ");
+            colorPrint(14, to_string(actualArista->peso));
+            colorPrint(10, " ) ");
             actualArista = actualArista->next;
         }
         cout << endl;
@@ -95,9 +119,10 @@ void imprimirGrafo(Node_vertice* cabeza){
     }
 }
 
-void liberarGrafo(Node_vertice* cabeza){
+// Libera la memoria utilizada por el grafo
+void liberarGrafo(Node_vertice* cabeza) {
     Node_vertice* actualNodo = cabeza;
-    while (actualNodo != NULL){
+    while (actualNodo != NULL) {
         Arista* actualArista = actualNodo->down;
         while (actualArista != NULL) {
             Arista* temp = actualArista;
@@ -110,6 +135,7 @@ void liberarGrafo(Node_vertice* cabeza){
     }
 }
 
+// Cuenta el número de vértices en el grafo
 int contarVertices(Node_vertice* grafo) {
     int count = 0;
     Node_vertice* actual = grafo;
@@ -121,16 +147,17 @@ int contarVertices(Node_vertice* grafo) {
 }
 
 int MAX=9999999;
+// Algoritmo de Prim para encontrar el Árbol Mínimo Cobertor (AMC)
 void primAMC(Node_vertice* grafo) {
     if (grafo == NULL) {
-        cout << "El grafo está vacío" << endl;
+        colorP(12, "El grafo está vacío");
         return;
     }
 
     int numVertices = contarVertices(grafo);
 
     if (numVertices == 0) {
-        cout << "No hay vertices en el grafo" << endl;
+        colorP(12, "No hay vértices en el grafo");
         return;
     }
 
@@ -159,8 +186,7 @@ void primAMC(Node_vertice* grafo) {
         }
 
         if (u == -1) {
-            cout << "El grafo no es conexo, no se puede completar el AMC." << endl;
-
+            colorP(12, "El grafo no es conexo, no se puede completar el AMC.");
             return;
         }
 
@@ -181,79 +207,78 @@ void primAMC(Node_vertice* grafo) {
         }
     }
 
-    colorP (13, "\n\nAlgoritmo de Prim:");
-    colorP (6, "\tArbol Minimo Cobertor (AMC):");
-    cout << "\tArista (Rama) \tPeso\n";
+    colorP(5, "\n=== ALGORITMO DE PRIM ===");
+    colorP(6, "Árbol Mínimo Cobertor (AMC):");
+    colorP(7, "Arista (Rama) \tPeso");
     
     int pesoTotal = 0;
     for (int i = 1; i < numVertices; i++) {
-        cout << "\t  ( " << verticePadre[i] << " - " << i << " )\t " << pesoMinimo[i] << endl;
+        colorPrint(10, "  ( ");
+        colorPrint(4, to_string(verticePadre[i]));
+        colorPrint(7, " - ");
+        colorPrint(4, to_string(i));
+        colorPrint(10, " )\t ");
+        colorP(14, to_string(pesoMinimo[i]));
         pesoTotal += pesoMinimo[i];
     }
     
-    cout << "\nPeso total del Arbol Minimo Cobertor: " << pesoTotal << endl;
-
+    colorPrint(2, "\nPeso total del Árbol Mínimo Cobertor: ");
+    colorP(1, to_string(pesoTotal));
 }
 
-// Función para imprimir el camino más corto desde el vertice indicado hasta el vertice destinatario
+// Función para imprimir el camino más corto desde el vértice indicado hasta el vértice destinatario
 void imprimirCamino(int destino, int verticePadre[], int origen) {
     if (destino == origen) {
-        cout << origen;
+        colorPrint(4, to_string(origen));
         return;
     }
     if (verticePadre[destino] == -1) {
-        cout << "No hay camino";
+        colorPrint(12, "No hay camino");
         return;
     }
     imprimirCamino(verticePadre[destino], verticePadre, origen);
-    cout << " -> " << destino;
-    
+    colorPrint(7, " -> ");
+    colorPrint(4, to_string(destino));
 }
 
-// Algoritmo de Dijkstra para encontrar el camino mas corto desde un vertice origen
-void djikstra (Node_vertice* grafo, int verticeOrigen){
+// Algoritmo de Dijkstra para encontrar el camino más corto desde un vértice origen
+void djikstra (Node_vertice* grafo, int verticeOrigen) {
     if (grafo == NULL) {
-        cout << "El grafo está vacío" << endl;
+        colorP(12, "El grafo está vacío");
         return;
     }
 
-    // Contar numero de vertices
-     int numVertices = contarVertices(grafo);
+    int numVertices = contarVertices(grafo);
 
     if (numVertices == 0) {
-        cout << "No hay vertices en el grafo" << endl;
+        colorP(12, "No hay vértices en el grafo");
         return;
     }
 
-    // Verificar que el vertice de origen existe
     if (buscarNodo(grafo, verticeOrigen) == NULL) {
-        cout << "El vertice origen " << verticeOrigen << " no existe en el grafo" << endl;
+        colorP(12, "El vértice origen " + to_string(verticeOrigen) + " no existe en el grafo");
         return;
     }
 
-    bool procesado[numVertices]; // Arreglo de booleanos para validar que ha sido procesado/marcado
+    bool procesado[numVertices];
     for (int i = 0; i < numVertices; i++) {
-        procesado[i] = false;  // Inicializa todas las posiciones del arreglo como falso
+        procesado[i] = false;
     }
 
-    int distancia[numVertices]; // Arreglo que guarda las distancias mínimas con respecto al origen
-    int verticePadre[numVertices]; // Guarda el vertice padre para reconstruir el camino
+    int distancia[numVertices];
+    int verticePadre[numVertices];
 
-    // Inicializar distancias como el maximo (9999999) y padres como -1
     for (int i = 0; i < numVertices; i++) {
-        distancia[i] = MAX;  // Inicializa todas las distancias como el "maximo"
+        distancia[i] = MAX;
         verticePadre[i] = -1;
     }
     
-    distancia[verticeOrigen] = 0; // La distancia entre el origen y si mismo, es 0
+    distancia[verticeOrigen] = 0;
 
-    // Procesar todos los vértices
     for (int count = 0; count < numVertices; count++) {
-        // Encontrar el vértice no procesado con la distancia mínima
         int minDistancia = MAX;
         int u = -1;
         
-        // Busca el vértice no procesado con la menor distancia
         for (int v = 0; v < numVertices; v++) {
             if (!procesado[v] && distancia[v] < minDistancia) {
                 minDistancia = distancia[v];
@@ -261,22 +286,19 @@ void djikstra (Node_vertice* grafo, int verticeOrigen){
             }
         }
 
-        // Si no encontramos un vértice disponible, entonces el grafo no es conexo desde el origen
         if (u == -1) {
             break;
         }
 
-        procesado[u] = true; // Marcar el vértice como procesado
+        procesado[u] = true;
 
-        // Actualizar las distancias de los vértices adyacentes
         Node_vertice* verticeU = buscarNodo(grafo, u);
         Arista* arista = verticeU->down;
         
         while (arista != NULL) {
-            int v = arista->destino; // El nodo destino
+            int v = arista->destino;
             int peso = arista->peso;
 
-            // Si encontramos un camino más corto hacia v a través de u
             if (!procesado[v] && distancia[u] != MAX && distancia[u] + peso < distancia[v]) {
                 distancia[v] = distancia[u] + peso;
                 verticePadre[v] = u;
@@ -285,23 +307,24 @@ void djikstra (Node_vertice* grafo, int verticeOrigen){
         }
     }
 
-    // Mostrar los resultados
-    cout << "\nCaminos más cortos partiendo desde el vértice " << verticeOrigen << ":\n";
-    cout << "Destino\tDistancia\tCamino\n";
+    colorP(6, "\n=== CAMINOS MÁS CORTOS ===");
+    colorPrint(7, "Partiendo desde el vértice ");
+    colorP(4, to_string(verticeOrigen));
+    colorP(7, "Destino\tDistancia\tCamino");
     
     for (int i = 0; i < numVertices; i++) {
-        cout << i << "\t";
+        colorPrint(4, to_string(i));
+        colorPrint(7, "\t");
         if (distancia[i] == MAX) {
-            cout << "\t\tNo se puede acceder.";
+            colorP(12, "∞\t\tNo se puede acceder.");
         } else {
-            cout << distancia[i] << "\t\t";
+            colorPrint(14, to_string(distancia[i]));
+            colorPrint(7, "\t\t");
             imprimirCamino(i, verticePadre, verticeOrigen);
+            cout << endl;
         }
-        cout << endl;
     }
-
 }
-
 
 int obtenerIndice(Node_vertice* grafo, int vertice) {
     int indice = 0;
@@ -313,11 +336,9 @@ int obtenerIndice(Node_vertice* grafo, int vertice) {
         actual = actual->next;
         indice++;
     }
-    return -1; // No fue encontrado
+    return -1;
 }
 
-
-// Función para comprobar si un color esta disponible para el vertice
 bool colorDisponible(Node_vertice* vertice, int colores[], int color, Node_vertice* grafo) {
     Arista* arista = vertice->down;
     while (arista != NULL) {
@@ -331,27 +352,25 @@ bool colorDisponible(Node_vertice* vertice, int colores[], int color, Node_verti
 }
 
 void colorearGrafo(Node_vertice* grafo, int numVertices) {
-int* colores = new int[numVertices];
-const char* nombresColores[] = {
-    "Rojo", "Verde", "Azul", "Amarillo", "Naranja",
-    "Morado", "Cian", "Rosa", "Gris", "Marrón"
-};
+    int* colores = new int[numVertices];
+    const char* nombresColores[] = {
+        "Rojo", "Verde", "Azul", "Amarillo", "Naranja",
+        "Morado", "Cyan", "Rosa", "Gris", "Marrón"
+    };
 
-int codigosColores[] = {
-    12, // Rojo
-    10, // Verde
-    9,  // Azul
-    14, // Amarillo
-    6,  // Naranja 
-    13, // Morado
-    11, // Cian
-    13, // Rosa 
-    8,  // Gris
-    4   // Marrón 
-};
+    int codigosColores[] = {
+        1,  // Rojo brillante
+        2,  // Verde brillante
+        4,  // Azul brillante
+        3,  // Amarillo brillante
+        6,  // Naranja (Cyan)
+        5,  // Morado brillante
+        11, // Cyan
+        13, // Rosa (Magenta)
+        8,  // Gris
+        14  // Marrón (Amarillo)
+    };
 
-    
-    // Inicializar todos los colores como no asignados (-1)
     for (int i = 0; i < numVertices; i++) {
         colores[i] = -1;
     }
@@ -360,7 +379,6 @@ int codigosColores[] = {
     while (actual != NULL) {
         int indice = obtenerIndice(grafo, actual->value);
 
-        // Probar colores desde 0 hasta numVertices - 1
         for (int c = 0; c < numVertices; c++) {
             if (colorDisponible(actual, colores, c, grafo)) {
                 colores[indice] = c;
@@ -371,78 +389,96 @@ int codigosColores[] = {
         actual = actual->next;
     }
 
-    // Mostrar grafo coloreado
-    cout << "Coloración del grafo:\n";
+    colorP(5, "\n=== COLORACIÓN DEL GRAFO ===");
     actual = grafo;
     while (actual != NULL) {
         int indice = obtenerIndice(grafo, actual->value);
         int color = colores[indice];
-        cout << "Vértice " << actual->value << " -> ";
+        colorPrint(7, "Vértice ");
+        colorPrint(4, to_string(actual->value));
+        colorPrint(7, " -> ");
         colorP(codigosColores[color], nombresColores[color]);
-        actual = actual -> next;
-}
+        actual = actual->next;
+    }
 
     delete[] colores;
 }
 
 int main(){
-   int verticeInicio, op;
+    int verticeInicio, op = 0;
     Node_vertice* grafo = leerArchivo();  
-        if (grafo != NULL) {
-            int numVertices = contarVertices(grafo);
-            cout << "TALLER #2 Grafos. Realizado por Enrique Godoy y Jose Quintero\n";
+    
+    if (grafo != NULL) {
+        int numVertices = contarVertices(grafo);
+        
+        // Título principal con colores
+        colorP(6, "\n╔════════════════════════════════════════════════════════════════╗");
+        colorP(6, "║            TALLER #2 - TEORÍA DE GRAFOS                       ║");
+        colorP(6, "║        Realizado por: Enrique Godoy y Jose Quintero            ║");
+        colorP(6, "╚════════════════════════════════════════════════════════════════╝");
 
         while (op != 5){
-            colorP(9, "\n      MENU");
-            cout << "1.  Imprimir Grafo\n";
-            cout << "2.  Ver Arbol Minimo CObertor (Algoritmo de Prim)\n";
-            cout << "3.  Ver el Camino de Costo Minimo partiendo desde un Vertice (Algoritmo de Djikstra)\n";
-            cout << "4.  Ver el coloreado de cada vertice del Grafo (Algoritmo Boraz de Coloracion)\n";
-            cout << "5.  Cerrar Programa\n";
-            cout << "\n\t Indique el numero de operacion que desea realizar: ";
+            colorP(3, "\n┌─────────────── MENÚ PRINCIPAL ───────────────┐");
+            colorP(7, "│ 1. Imprimir Grafo                            │");
+            colorP(7, "│ 2. Ver Árbol Mínimo Cobertor (Prim)          │");
+            colorP(7, "│ 3. Camino de Costo Mínimo (Dijkstra)         │");
+            colorP(7, "│ 4. Coloración del Grafo (Algoritmo Boraz)    │");
+            colorP(7, "│ 5. Cerrar Programa                           │");
+            colorP(3, "└───────────────────────────────────────────────┘");
+            
+            colorPrint(14, "\nIndique el número de operación que desea realizar: ");
             cin >> op;
-            color_siguiente(7, " ");
+            
+            switch (op){
+                case 1:
+                    imprimirGrafo(grafo);
+                    break;
 
+                case 2:
+                    primAMC(grafo);
+                    break;
 
-                switch (op){
-            case 1:
-                imprimirGrafo(grafo);
-                break;
-
-            case 2:
-                primAMC(grafo);
-                break;
-
-            case 3:
-                colorP (1, "\n\nAlgoritmo de Djikstra:");
+                case 3:
+                    colorP(5, "\n=== ALGORITMO DE DIJKSTRA ===");
                     do{
-                    cout << "\n\tIndique el Vertice desde donde se desea conocer el camino de menor costo hacia todos los vertices: \n";
-                    cout << "\tVertices disponibles: ( 0 - " << numVertices-1 << " ): ";
-                    cin >> verticeInicio;
-                    if (verticeInicio < 0 || verticeInicio > numVertices){
-                        cout << "ERROR. El vertice debe estar entre el rango indicado ( 0 - " << numVertices-1 << " )\n";
-                        cout << "Intentelo nuevamente\n";
-                    }
-                    } while (verticeInicio < 0 || verticeInicio > numVertices);
+                        colorPrint(7, "\nIndique el vértice desde donde desea conocer el camino de menor costo: ");
+                        colorPrint(6, "\nVértices disponibles: ( 0 - ");
+                        colorPrint(6, to_string(numVertices-1));
+                        colorPrint(6, " ): ");
+                        cin >> verticeInicio;
+                        
+                        if (verticeInicio < 0 || verticeInicio >= numVertices){
+                            colorP(12, "ERROR: El vértice debe estar entre el rango indicado");
+                            colorPrint(14, "Rango válido: ( 0 - ");
+                            colorPrint(14, to_string(numVertices-1));
+                            colorP(14, " )");
+                            colorP(14, "Inténtelo nuevamente...");
+                        }
+                    } while (verticeInicio < 0 || verticeInicio >= numVertices);
                     djikstra(grafo, verticeInicio);
-                break;
+                    break;
 
-            case 4:
-                colorP(5, "Algoritmo Boraz de coloración");
-                colorearGrafo(grafo, numVertices);
-                break;
+                case 4:
+                    colorP(5, "\n=== ALGORITMO BORAZ DE COLORACIÓN ===");
+                    colorearGrafo(grafo, numVertices);
+                    break;
 
-            case 5:
-                liberarGrafo(grafo);
-                cout << "\tLiberando memoria...\n";
-                cout << "\tCerrando el programa...";
-                break;
+                case 5:
+                    colorP(14, "\nLiberando memoria...");
+                    liberarGrafo(grafo);
+                    colorP(2, "Memoria liberada correctamente");
+                    colorP(6, "¡Gracias por usar el programa!");
+                    colorP(7, "Cerrando...");
+                    break;
 
-            default:
-                cout << "Opcion no valida";
-                break;
+                default:
+                    colorP(12, "Opción no válida. Por favor, seleccione una opción del 1 al 5.");
+                    break;
             }
         }  
-    return 0;
+    } else {
+        colorP(12, "No se pudo cargar el grafo. Verifique el archivo 'estructura.txt'");
     }
+    
+    return 0;
 }
